@@ -11,25 +11,16 @@ branches:
 services:
   - docker
 
-cache:
-  directories:
-  - docker_images
-
-before_install:
-  - docker load -i docker_images/images.tar || true
-
-before_cache:
-  - docker save -o docker_images/images.tar $(docker images -a -q)
-
 jobs:
   include:
-    - stage: "Build"
-      script: docker build --target build .
-    - stage: "Test"
-      script: 
+    - stage: "Build / Test / Create image"
+      script:
+        # Build
+        - docker build --target build .
+        # Test
         - docker build --target test .
         - docker create --name travistest-test $(docker images --filter "label=travistest-test=true" -q | head -1)
         - docker cp travistest-test:/test-results ./test-results
         - cat ./test-results/test-results.xml
-    - stage: "Create image"
-      script: docker build -t travistest:1.0.0 .
+        # Create image
+        - docker build -t travistest:1.0.0 .
