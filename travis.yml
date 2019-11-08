@@ -1,0 +1,21 @@
+language: csharp
+
+branches:
+  only:
+  - master
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: "Build"
+      script: docker build --target build .
+    - stage: "Test"
+      script: 
+        - docker build --target test .
+	- docker create --name travistest-test $(docker images --filter "label=travistest-test=true" -q | head -1)
+	- docker cp travistest-test:/test-results ./test-results
+	- echo ./test-results/test-results.xml
+    - stage: "Create image"
+      script: docker build -t travistest:1.0.0 .

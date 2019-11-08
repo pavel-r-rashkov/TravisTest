@@ -15,13 +15,14 @@ RUN dotnet build
 
 # test
 FROM build AS test
+LABEL travistest-test=true
 WORKDIR /app/Test
-RUN dotnet test
+RUN dotnet test --results-directory ../../test-results --logger "trx;LogFileName=test-results.xml"
 
 # publish
 FROM build AS publish
 WORKDIR /app/Web
-RUN dotnet publish -o out
+RUN dotnet publish -c Release -o out
 
 # run
 FROM microsoft/dotnet:2.1-runtime AS runtime
