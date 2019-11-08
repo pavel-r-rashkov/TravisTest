@@ -1,4 +1,8 @@
 language: csharp
+os: linux
+mono: none
+sudo: required
+dist: trusty
 
 branches:
   only:
